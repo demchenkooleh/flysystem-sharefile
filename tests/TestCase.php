@@ -1,63 +1,38 @@
 <?php
 
-namespace Kapersoft\FlysystemSharefile\Tests;
+namespace Citrix\FlysystemSharefile\Tests;
 
 use Faker\Factory;
 use Faker\Generator;
 use Sabre\DAV\Exception;
+use Citrix\Sharefile\Client;
 use Sabre\HTTP\HttpException;
-use Kapersoft\Sharefile\Client;
 use Sabre\DAV\Client as WebDAVClient;
-use Kapersoft\FlysystemSharefile\sharefileAdapter;
+use Citrix\FlysystemSharefile\SharefileAdapter;
 use PHPUnit\Framework\TestCase as PHPUnit_Framework_Testcase;
 
-/**
- * Abstract class for online ShareFile tests.
- *
- * @author   Jan Willem Kaper <kapersoft@gmail.com>
- * @license  MIT (see License.txt)
- *
- * @link     http://github.com/kapersoft/flysystem-sharefile
- */
 abstract class TestCase extends PHPUnit_Framework_Testcase
 {
-    /**
-     * ShareFile root folder.
-     *
-     * @var string
-     */
-    protected $sharefileRoot;
+    protected string $sharefileRoot;
+
+    protected SharefileAdapter $adapter;
+
+    protected WebDAVClient $webdavClient;
+
+    protected string $webdavRoot;
 
     /**
-     * ShareFile Adapter.
-     *
-     * @var \Kapersoft\FlysystemSharefile\SharefileAdapter
+     * @return void
+     * @throws \Exception
      */
-    protected $adapter;
-
-    /**
-     * WebDav Client.
-     *
-     *  @var \Sabre\DAV\Client
-     */
-    protected $webdavClient;
-
-    /**
-     * WebDav root folder.
-     * =.
-     * @var string
-     */
-    protected $webdavRoot;
-
-    /**
-     * Check environment variables and setup tests.
-     */
-    public function setUp()
+    public function setUp(): void
     {
-        if (! $this->checkEnvironmentVariables()) {
-            $this->markTestSkipped('No ShareFile credentials are found. '.
-                'Fill in your ShareFile credentials under section <PHP> in the file '.
-                'phpunit.xml.dist in the project root folder.');
+        if (!$this->checkEnvironmentVariables()) {
+            $this->markTestSkipped(
+                'No ShareFile credentials are found. ' .
+                'Fill in your ShareFile credentials under section <PHP> in the file ' .
+                'phpunit.xml.dist in the project root folder.'
+            );
         }
 
         $this->initializeAdapter();
@@ -70,7 +45,7 @@ abstract class TestCase extends PHPUnit_Framework_Testcase
     /**
      * Tear down tests.
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->adapter);
         $this->clearResources();
@@ -81,9 +56,9 @@ abstract class TestCase extends PHPUnit_Framework_Testcase
      *
      * @return bool
      */
-    protected function checkEnvironmentVariables():bool
+    protected function checkEnvironmentVariables(): bool
     {
-        return ! $this->varEmpty(
+        return !$this->varEmpty(
             getenv('SHAREFILE_ROOT'),
             getenv('SHAREFILE_HOSTNAME'),
             getenv('SHAREFILE_CLIENT_ID'),
@@ -95,9 +70,10 @@ abstract class TestCase extends PHPUnit_Framework_Testcase
     }
 
     /**
-     * Initialize ShareFile FlySystem Adapter.
+     * @return void
+     * @throws \Exception
      */
-    protected function initializeAdapter()
+    protected function initializeAdapter(): void
     {
         $this->sharefileRoot = getenv('SHAREFILE_ROOT');
 
@@ -115,11 +91,11 @@ abstract class TestCase extends PHPUnit_Framework_Testcase
     /**
      * Initialize WebDav resource to ShareFile.
      */
-    protected function initializeResource()
+    protected function initializeResource(): void
     {
         $this->webdavRoot = getenv('WEBDAV_ROOT');
 
-        $guessedUrl = 'https://'.str_replace(
+        $guessedUrl = 'https://' . str_replace(
             'sharefile.com',
             'sharefile-webdav.com',
             strtolower(getenv('SHAREFILE_HOSTNAME'))
@@ -139,7 +115,7 @@ abstract class TestCase extends PHPUnit_Framework_Testcase
      *
      * @return string
      */
-    protected function getResourceContent(string $path):string
+    protected function getResourceContent(string $path): string
     {
         $location = $this->getResourceLocation($path);
 
@@ -153,7 +129,7 @@ abstract class TestCase extends PHPUnit_Framework_Testcase
      *
      * @return bool
      */
-    protected function hasResource(string $path):bool
+    protected function hasResource(string $path): bool
     {
         $location = $this->getResourceLocation($path);
 
@@ -161,9 +137,7 @@ abstract class TestCase extends PHPUnit_Framework_Testcase
             $this->webdavClient->propFind($location, ['{DAV:}displayname']);
 
             return true;
-        } catch (Exception $e) {
-            return false;
-        } catch (HttpException $e) {
+        } catch (Exception|HttpException $e) {
             return false;
         }
     }
@@ -175,16 +149,19 @@ abstract class TestCase extends PHPUnit_Framework_Testcase
      *
      * @return string
      */
-    protected function getResourceLocation(string $path):string
+    protected function getResourceLocation(string $path): string
     {
-        $path = implode('/', array_filter([
-            trim($this->webdavRoot, '/'),
-            trim($path, '/'),
-        ]));
+        $path = implode(
+            '/',
+            array_filter([
+                trim($this->webdavRoot, '/'),
+                trim($path, '/'),
+            ])
+        );
 
         $path = explode('/', $path);
-        for ($i = 0; $i < count($path); $i++) {
-            $path[$i] = rawurlencode($path[$i]);
+        foreach ($path as $i => $iValue) {
+            $path[$i] = rawurlencode($iValue);
         }
 
         return implode('/', $path);
@@ -199,18 +176,17 @@ abstract class TestCase extends PHPUnit_Framework_Testcase
      */
     protected function createResourceDir(string $path)
     {
-        if (empty($path) || $path == '.') {
+        if (empty($path) || $path === '.') {
             return;
         }
         $location = $this->getResourceLocation($path);
-
         $this->webdavClient->request('MKCOL', $location);
     }
 
     /**
      * Creates a resource file with content.
      *
-     * @param string $path     Path of the file
+     * @param string $path Path of the file
      * @param string $contents Contents of the file
      *
      * @return void
@@ -231,15 +207,15 @@ abstract class TestCase extends PHPUnit_Framework_Testcase
     {
         $location = $this->getResourceLocation('/');
 
-        $this->webdavClient->request('DELETE', $location.'/');
+        $this->webdavClient->request('DELETE', $location . '/');
     }
 
     /**
      * Create random filename.
      */
-    protected function randomFileName():string
+    protected function randomFileName(): string
     {
-        return $this->faker()->name.'.'.$this->faker()->fileExtension;
+        return $this->faker()->name . '.' . $this->faker()->fileExtension;
     }
 
     /**
@@ -247,7 +223,7 @@ abstract class TestCase extends PHPUnit_Framework_Testcase
      *
      * @return Generator
      */
-    protected function faker():Generator
+    protected function faker(): Generator
     {
         return Factory::create();
     }
@@ -316,11 +292,11 @@ abstract class TestCase extends PHPUnit_Framework_Testcase
             ['test 1/test.txt'],
             ['test/test 1.txt'],
             ['test  1/test  2.txt'],
-            [$this->faker()->word.'/'.$this->randomFileName()],
-            [$this->faker()->word.'/'.$this->randomFileName()],
-            [$this->faker()->word.'/'.$this->randomFileName()],
-            [$this->faker()->word.'/'.$this->randomFileName()],
-            [$this->faker()->word.'/'.$this->randomFileName()],
+            [$this->faker()->word . '/' . $this->randomFileName()],
+            [$this->faker()->word . '/' . $this->randomFileName()],
+            [$this->faker()->word . '/' . $this->randomFileName()],
+            [$this->faker()->word . '/' . $this->randomFileName()],
+            [$this->faker()->word . '/' . $this->randomFileName()],
         ];
     }
 
@@ -334,8 +310,8 @@ abstract class TestCase extends PHPUnit_Framework_Testcase
         $provider = [];
         foreach ($this->filesProvider() as $filename) {
             $filename = $filename[0];
-            $provider[] = [$filename, '/target/'.$filename];
-            $provider[] = [$filename, 'copy of '.basename($filename)];
+            $provider[] = [$filename, '/target/' . $filename];
+            $provider[] = [$filename, 'copy of ' . basename($filename)];
         }
 
         return $provider;
