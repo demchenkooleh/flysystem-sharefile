@@ -429,6 +429,9 @@ class SharefileAdapter extends AbstractAdapter
             [
                 'timestamp' => $timestamp,
                 'path' => $path,
+                'parentId' => $item['Parent']['Id'] ?? null,
+                'id' => $item['Id'],
+                'odata.type' => $item['odata.type'],
                 'mimetype' => $mimetype,
                 'dirname' => pathinfo($path, PATHINFO_DIRNAME),
                 'extension' => pathinfo($item['FileName'], PATHINFO_EXTENSION),
