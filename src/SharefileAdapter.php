@@ -424,7 +424,7 @@ class SharefileAdapter extends AbstractAdapter
             $mimetype = 'inode/directory';
             $type = 'dir';
         }
-
+        $pathInfo = pathinfo($path, PATHINFO_DIRNAME);
         return array_merge(
             [
                 'timestamp' => $timestamp,
@@ -433,7 +433,7 @@ class SharefileAdapter extends AbstractAdapter
                 'id' => $item['Id'],
                 'odata.type' => $item['odata.type'],
                 'mimetype' => $mimetype,
-                'dirname' => pathinfo($path, PATHINFO_DIRNAME),
+                'dirname' => $pathInfo === '.' ? '': $pathInfo,
                 'extension' => pathinfo($item['FileName'], PATHINFO_EXTENSION),
                 'filename' => pathinfo($item['FileName'], PATHINFO_FILENAME),
                 'basename' => pathinfo($item['FileName'], PATHINFO_FILENAME),
