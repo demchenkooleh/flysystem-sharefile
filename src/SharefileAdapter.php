@@ -23,6 +23,7 @@ class SharefileAdapter extends AbstractAdapter
     private const CAN_DELETE_CHILD_ITEMS = 'CanDeleteChildItems';
     private const CAN_MANAGE_PERMISSIONS = 'CanManagePermissions';
     private const CAN_CREATEOFFICE_DOCUMENTS = 'CanCreateOfficeDocuments';
+    public const PERSONAL_FOLDERS = 'Personal Folders';
 
     protected Client $client;
 
@@ -429,7 +430,7 @@ class SharefileAdapter extends AbstractAdapter
             $mimetype = 'inode/directory';
             $type = 'dir';
         }
-        $pathInfo = pathinfo($path, PATHINFO_DIRNAME);
+        $pathInfo = $this->getDirnameForItemInfo($path);
         return array_merge(
             [
                 'timestamp' => $timestamp,
@@ -438,7 +439,7 @@ class SharefileAdapter extends AbstractAdapter
                 'id' => $item['Id'],
                 'odata.type' => $item['odata.type'],
                 'mimetype' => $mimetype,
-                'dirname' => $pathInfo === '.' ? '' : $pathInfo,
+                'dirname' => $pathInfo,
                 'extension' => pathinfo($item['FileName'], PATHINFO_EXTENSION),
                 'filename' => pathinfo($item['FileName'], PATHINFO_FILENAME),
                 'basename' => pathinfo($item['FileName'], PATHINFO_FILENAME),
@@ -449,6 +450,15 @@ class SharefileAdapter extends AbstractAdapter
             ],
             $this->returnShareFileItem ? ['sharefile_item' => $item] : []
         );
+    }
+
+    protected function getDirnameForItemInfo(string $path)
+    {
+        $pathInfo = pathinfo($path, PATHINFO_DIRNAME);
+        if($pathInfo === '.' || $pathInfo === self::PERSONAL_FOLDERS){
+            $pathInfo = '';
+        }
+        return $pathInfo;
     }
 
     protected function mapItemList(array $items, string $path): array
