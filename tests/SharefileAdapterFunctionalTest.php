@@ -14,192 +14,192 @@ class SharefileAdapterFunctionalTest extends TestCase
      * @test
      * @dataProvider  filesProvider
      */
-//    public function testCanFindFiles(string $name): void
-//    {
-//        $contents = $this->faker()->text;
-//        $this->createResourceFile($name, $contents);
-//
-//        $this->assertTrue((bool) $this->hasResource($name));
-//    }
-//
-//    /**
-//     * @dataProvider  withSubFolderProvider
-//     */
-//    public function testFindFilesInSubfolders(string $path): void
-//    {
-//        $contents = $this->faker()->text;
-//        $this->createResourceFile($path, $contents);
-//
-//        $this->assertTrue((bool) $this->hasResource($path));
-//    }
-//
-//    /**
-//     * @test
-//     * @dataProvider filesProvider
-//     */
-//    public function testCanRead(string $name): void
-//    {
-//        $contents = $this->faker()->text;
-//
-//        $this->createResourceFile($name, $contents);
-//
-//        $response = $this->adapter->read($name);
-//
-//        self::assertArraySubset([
-//            'type' => 'file',
-//            'path' => $name,
-//            'contents' => $contents,
-//        ], $response);
-//    }
-//
-//    /**
-//     * @test
-//     * @dataProvider filesProvider
-//     */
-//    public function testCanReadstream(string $name): void
-//    {
-//        $contents = $this->faker()->text;
-//        $this->createResourceFile($name, $contents);
-//
-//        $response = $this->adapter->readstream($name);
-//
-//        self::assertArraySubset([
-//            'type' => 'file',
-//            'path' => $name,
-//        ], $response);
-//
-//        $this->assertIsResource($response['stream']);
-//    }
-//
-//    /**
-//     * @test
-//     * @dataProvider withSubFolderProvider
-//     */
-//    public function testCanListContents(string $path): void
-//    {
-//        // No file
-//        $this->createResourceDir(UTIL::dirname($path));
-//        $this->assertCount(0, $this->adapter->listContents(Util::dirname($path)));
-//
-//        // Single file
-//        $contents = $this->faker()->text;
-//        $this->createResourceFile($path, $contents);
-//
-//        $this->assertCount(1, $this->adapter->listContents(Util::dirname($path)));
-//
-//        // Multiple files
-//        $this->createResourceFile(str_replace('/', '/first copy of ', $path), $contents);
-//        $this->createResourceFile(str_replace('/', '/second copy of ', $path), $contents);
-//
-//        $this->assertCount(3, $this->adapter->listContents(Util::dirname($path)));
-//    }
-//
-//    /**
-//     * @test
-//     * @dataProvider withSubFolderProvider
-//     */
-//    public function testCanGetMetadata(string $path): void
-//    {
-//        $contents = $this->faker()->text;
-//        $this->createResourceFile($path, $contents);
-//
-//        self::assertArraySubset(['type' => 'file', 'path' => $path], $this->adapter->getMetadata($path));
-//    }
-//
-//    public function testItCanGetSize()
-//    {
-//        $contents = $this->faker()->text;
-//        $this->createResourceFile('foo', $contents);
-//
-//        $this->assertSame(strlen($contents), $this->adapter->getSize('foo')['size']);
-//    }
-//
-//    public function testItCanGetMimetypes(): void
-//    {
-//        $this->createResourceFile('foo.json', 'bar');
-//
-//        $this->assertSame('application/json', $this->adapter->getMimetype('foo.json')['mimetype']);
-//    }
-//
-//    public function testItCanGetTimestamps(): void
-//    {
-//        $this->createResourceFile('foo', 'bar');
-//
-//        $this->assertLessThan(time() + 1, $this->adapter->getTimestamp('foo')['timestamp']);
-//        $this->assertGreaterThan($this->adapter->getTimestamp('foo')['timestamp'], time() - 60);
-//    }
-//
-//    /**
-//     * @test
-//     * @dataProvider filesProvider
-//     */
-//    public function testCanWrite(string $filename): void
-//    {
-//        $contents = $this->faker()->text;
-//
-//        $result = $this->adapter->write($filename, $contents, new Config);
-//
-//        self::assertArraySubset([
-//            'type' => 'file',
-//            'path' => $filename,
-//            'contents' => $contents,
-//            'mimetype' => Util::guessMimeType($filename, $contents),
-//        ], $result);
-//
-//        $this->assertEquals($contents, $this->getResourceContent($filename));
-//    }
-//
-//    /**
-//     * @test
-//     * @dataProvider filesProvider
-//     */
-//    public function testCanUpdate(string $filename): void
-//    {
-//        $contents = $this->faker()->text;
-//
-//        $this->createResourceFile($filename, $contents);
-//        $this->assertEquals($contents, $this->getResourceContent($filename));
-//
-//        $newContents = $this->faker()->text;
-//        $result = $this->adapter->update($filename, $newContents, new Config);
-//
-//        self::assertArraySubset([
-//            'type' => 'file',
-//            'path' => $filename,
-//            'contents' => $newContents,
-//            'mimetype' => Util::guessMimeType($filename, $contents),
-//        ], $result);
-//
-//        $this->assertNotEquals($contents, $this->getResourceContent($filename));
-//        $this->assertEquals($newContents, $this->getResourceContent($filename));
-//    }
-//
-//    /**
-//     * @test
-//     * @dataProvider filesProvider
-//     */
-//    public function testCanWritestreamAndUpdatestream(string $filename): void
-//    {
-//        $contents = $this->faker()->text;
-//
-//        $stream = fopen('php://memory', 'rb+');
-//        fwrite($stream, $contents);
-//        rewind($stream);
-//
-//        $this->adapter->writeStream($filename, $stream, new Config);
-//        $this->assertEquals($contents, $this->getResourceContent($filename));
-//
-//        $newContents = $this->faker()->text;
-//
-//        $stream = fopen('php://memory', 'rb+');
-//        fwrite($stream, $newContents);
-//        rewind($stream);
-//
-//        $this->adapter->updateStream($filename, $stream, new Config);
-//
-//        $this->assertNotEquals($contents, $this->getResourceContent($filename));
-//        $this->assertEquals($newContents, $this->getResourceContent($filename));
-//    }
+    public function testCanFindFiles(string $name): void
+    {
+        $contents = $this->faker()->text;
+        $this->createResourceFile($name, $contents);
+
+        $this->assertTrue((bool) $this->hasResource($name));
+    }
+
+    /**
+     * @dataProvider  withSubFolderProvider
+     */
+    public function testFindFilesInSubfolders(string $path): void
+    {
+        $contents = $this->faker()->text;
+        $this->createResourceFile($path, $contents);
+
+        $this->assertTrue((bool) $this->hasResource($path));
+    }
+
+    /**
+     * @test
+     * @dataProvider filesProvider
+     */
+    public function testCanRead(string $name): void
+    {
+        $contents = $this->faker()->text;
+
+        $this->createResourceFile($name, $contents);
+
+        $response = $this->adapter->read($name);
+
+        self::assertArraySubset([
+            'type' => 'file',
+            'path' => $name,
+            'contents' => $contents,
+        ], $response);
+    }
+
+    /**
+     * @test
+     * @dataProvider filesProvider
+     */
+    public function testCanReadstream(string $name): void
+    {
+        $contents = $this->faker()->text;
+        $this->createResourceFile($name, $contents);
+
+        $response = $this->adapter->readstream($name);
+
+        self::assertArraySubset([
+            'type' => 'file',
+            'path' => $name,
+        ], $response);
+
+        $this->assertIsResource($response['stream']);
+    }
+
+    /**
+     * @test
+     * @dataProvider withSubFolderProvider
+     */
+    public function testCanListContents(string $path): void
+    {
+        // No file
+        $this->createResourceDir(UTIL::dirname($path));
+        $this->assertCount(0, $this->adapter->listContents(Util::dirname($path)));
+
+        // Single file
+        $contents = $this->faker()->text;
+        $this->createResourceFile($path, $contents);
+
+        $this->assertCount(1, $this->adapter->listContents(Util::dirname($path)));
+
+        // Multiple files
+        $this->createResourceFile(str_replace('/', '/first copy of ', $path), $contents);
+        $this->createResourceFile(str_replace('/', '/second copy of ', $path), $contents);
+
+        $this->assertCount(3, $this->adapter->listContents(Util::dirname($path)));
+    }
+
+    /**
+     * @test
+     * @dataProvider withSubFolderProvider
+     */
+    public function testCanGetMetadata(string $path): void
+    {
+        $contents = $this->faker()->text;
+        $this->createResourceFile($path, $contents);
+
+        self::assertArraySubset(['type' => 'file', 'path' => $path], $this->adapter->getMetadata($path));
+    }
+
+    public function testItCanGetSize()
+    {
+        $contents = $this->faker()->text;
+        $this->createResourceFile('foo', $contents);
+
+        $this->assertSame(strlen($contents), $this->adapter->getSize('foo')['size']);
+    }
+
+    public function testItCanGetMimetypes(): void
+    {
+        $this->createResourceFile('foo.json', 'bar');
+
+        $this->assertSame('application/json', $this->adapter->getMimetype('foo.json')['mimetype']);
+    }
+
+    public function testItCanGetTimestamps(): void
+    {
+        $this->createResourceFile('foo', 'bar');
+
+        $this->assertLessThan(time() + 1, $this->adapter->getTimestamp('foo')['timestamp']);
+        $this->assertGreaterThan($this->adapter->getTimestamp('foo')['timestamp'], time() - 60);
+    }
+
+    /**
+     * @test
+     * @dataProvider filesProvider
+     */
+    public function testCanWrite(string $filename): void
+    {
+        $contents = $this->faker()->text;
+
+        $result = $this->adapter->write($filename, $contents, new Config);
+
+        self::assertArraySubset([
+            'type' => 'file',
+            'path' => $filename,
+            'contents' => $contents,
+            'mimetype' => Util::guessMimeType($filename, $contents),
+        ], $result);
+
+        $this->assertEquals($contents, $this->getResourceContent($filename));
+    }
+
+    /**
+     * @test
+     * @dataProvider filesProvider
+     */
+    public function testCanUpdate(string $filename): void
+    {
+        $contents = $this->faker()->text;
+
+        $this->createResourceFile($filename, $contents);
+        $this->assertEquals($contents, $this->getResourceContent($filename));
+
+        $newContents = $this->faker()->text;
+        $result = $this->adapter->update($filename, $newContents, new Config);
+
+        self::assertArraySubset([
+            'type' => 'file',
+            'path' => $filename,
+            'contents' => $newContents,
+            'mimetype' => Util::guessMimeType($filename, $contents),
+        ], $result);
+
+        $this->assertNotEquals($contents, $this->getResourceContent($filename));
+        $this->assertEquals($newContents, $this->getResourceContent($filename));
+    }
+
+    /**
+     * @test
+     * @dataProvider filesProvider
+     */
+    public function testCanWritestreamAndUpdatestream(string $filename): void
+    {
+        $contents = $this->faker()->text;
+
+        $stream = fopen('php://memory', 'rb+');
+        fwrite($stream, $contents);
+        rewind($stream);
+
+        $this->adapter->writeStream($filename, $stream, new Config);
+        $this->assertEquals($contents, $this->getResourceContent($filename));
+
+        $newContents = $this->faker()->text;
+
+        $stream = fopen('php://memory', 'rb+');
+        fwrite($stream, $newContents);
+        rewind($stream);
+
+        $this->adapter->updateStream($filename, $stream, new Config);
+
+        $this->assertNotEquals($contents, $this->getResourceContent($filename));
+        $this->assertEquals($newContents, $this->getResourceContent($filename));
+    }
 
     /**
      * @dataProvider filesProvider

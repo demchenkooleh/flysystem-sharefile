@@ -537,7 +537,7 @@ class SharefileAdapter extends AbstractAdapter
                 return $item;
             }
         } catch (exception $e) {
-            throw new Exception($e);
+            return false;
         }
 
         return false;
