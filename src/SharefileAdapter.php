@@ -306,18 +306,27 @@ class SharefileAdapter extends AbstractAdapter
      */
     public function createDir($dirname, Config $config = null)
     {
-        $parentFolder = Util::dirname($dirname);
-        $folder = basename($dirname);
-
-        if (!$parentFolderItem = $this->getItemByPath($parentFolder)) {
-            return false;
+        $dirs = explode('/', $dirname);
+        $dirs = array_filter($dirs);
+        $parentFolderName = array_shift($dirs);
+        $fullPathForCreate = [];
+        $parentFolderItem = null;
+        if ($parentFolderName !== self::PERSONAL_FOLDERS) {
+            $parentFolderItem = $this->getItemByPath('.');
+            array_unshift($dirs, $parentFolderName);
         }
-
-        if (!$this->checkAccessControl($parentFolderItem, self::CAN_ADD_FOLDER)) {
-            return false;
+        foreach ($dirs as $dir) {
+            $fullPathForCreate[] = $dir;
+            $splitPath = implode('/', $fullPathForCreate);
+            if (!$item = $this->getItemByPath($splitPath)) {
+                if (!$this->checkAccessControl($parentFolderItem, self::CAN_ADD_FOLDER)) {
+                    return false;
+                }
+                $parentFolderItem = $this->client->createFolder($parentFolderItem['Id'], $dir, $dir, false);
+            } else {
+                $parentFolderItem = $item;
+            }
         }
-
-        $this->client->createFolder($parentFolderItem['Id'], $folder, $folder, true);
 
         return $this->has($dirname);
     }
