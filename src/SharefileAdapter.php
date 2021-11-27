@@ -98,11 +98,6 @@ class SharefileAdapter extends AbstractAdapter
      */
     public function listContents($directory = '', $recursive = false)
     {
-        if ($directory === '/' || $directory === '') {
-            $homeDir = $this->client->getHomeFolder();
-            $directory = $homeDir['Name'] ?? $directory;
-        }
-
         if (!$item = $this->getItemByPath($directory)) {
             return false;
         }
