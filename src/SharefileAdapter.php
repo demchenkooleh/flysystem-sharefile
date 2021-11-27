@@ -102,7 +102,7 @@ class SharefileAdapter extends AbstractAdapter
             return false;
         }
 
-        return $this->buildItemList($item, $directory, $recursive);
+        return $this->buildItemList($item, $directory, $recursive, true);
     }
 
     /**
@@ -475,7 +475,7 @@ class SharefileAdapter extends AbstractAdapter
         );
     }
 
-    protected function buildItemList(array $item, string $path, bool $recursive = false): array
+    protected function buildItemList(array $item, string $path, bool $recursive = false, bool $isDirOnly = false): array
     {
         if ($this->isShareFileApiModelsFile($item)) {
             return [];
@@ -487,7 +487,7 @@ class SharefileAdapter extends AbstractAdapter
             return [];
         }
 
-        $children = $this->removeAllExceptFilesAndFolders($children['Children']);
+        $children = $this->removeAllExceptFilesAndFolders($children['Children'], $isDirOnly);
 
         $itemList = $this->mapItemList($children, $path);
 
@@ -503,11 +503,14 @@ class SharefileAdapter extends AbstractAdapter
         return $itemList;
     }
 
-    protected function removeAllExceptFilesAndFolders(array $items): array
+    protected function removeAllExceptFilesAndFolders(array $items, bool $isDirOnly = false): array
     {
         return array_filter(
             $items,
-            function ($item) {
+            function ($item) use ($isDirOnly) {
+                if ($isDirOnly) {
+                    return $this->isShareFileApiModelsFolder($item);
+                }
                 return $this->isShareFileApiModelsFolder($item) || $this->isShareFileApiModelsFile($item);
             }
         );
