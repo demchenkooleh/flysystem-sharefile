@@ -24,6 +24,7 @@ class SharefileAdapter extends AbstractAdapter
     private const CAN_MANAGE_PERMISSIONS = 'CanManagePermissions';
     private const CAN_CREATEOFFICE_DOCUMENTS = 'CanCreateOfficeDocuments';
     public const PERSONAL_FOLDERS = 'Personal Folders';
+    public const NAME_FOLDERS = 'Folders';
 
     protected Client $client;
 
@@ -363,6 +364,22 @@ class SharefileAdapter extends AbstractAdapter
     public function getClient(): Client
     {
         return $this->client;
+    }
+
+    public function getPreparedBreadcrumps(string $itemId): array
+    {
+        $allBreadcrumps = $this->client->getItemBreadcrumps($itemId);
+        $path = [];
+
+        foreach ($allBreadcrumps['value'] as $broadcrump) {
+            $name = $broadcrump['Name'];
+            if ($name === self::NAME_FOLDERS) {
+                $path[] = '/';
+            } elseif ($name !== self::PERSONAL_FOLDERS) {
+                $path[] = $name;
+            }
+        }
+        return $path;
     }
 
     /**
