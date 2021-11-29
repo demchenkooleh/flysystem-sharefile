@@ -371,12 +371,12 @@ class SharefileAdapter extends AbstractAdapter
         $allBreadcrumps = $this->client->getItemBreadcrumps($itemId);
         $path = [];
 
-        foreach ($allBreadcrumps['value'] as $broadcrump) {
-            $name = $broadcrump['Name'];
+        foreach ($allBreadcrumps['value'] as $breadcrump) {
+            $name = $breadcrump['Name'];
             if ($name === self::NAME_FOLDERS) {
                 $path[] = '/';
             } elseif ($name !== self::PERSONAL_FOLDERS) {
-                $path[] = $name;
+                $path[] = '/' . $name;
             }
         }
         return $path;
